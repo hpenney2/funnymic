@@ -8,6 +8,6 @@ license = "MIT"
 futures = "0.3.32"
 inquire = "0.9.4"
 pulseaudio = "0.3.1"
-rdev = "0.5.3"
+rdev = { version = "0.5.3" }
 tokio = { version = "1.52.3", features = ["full"] }
 
