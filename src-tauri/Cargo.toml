@@ -22,11 +22,15 @@ tauri = { version = "2", features = [ "tray-icon" ] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-rdev = "0.5.3"
 thiserror = "2.0.18"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 pulseaudio = "0.3.1"
+rdev = "0.5.3"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = ">=0.59, <=0.62", features = ["Win32_System_Com", "Win32_UI_Shell_PropertiesSystem", "Win32_Devices_FunctionDiscovery", "Win32_Media_Audio"] }
+com-policy-config = "0.6.0"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-global-shortcut = "2"

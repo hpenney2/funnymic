@@ -11,6 +11,9 @@ mod swapper;
 #[cfg(target_os = "linux")]
 mod painputswapper;
 
+#[cfg(target_os = "windows")]
+mod wininputswapper;
+
 use crate::swapper::{
     get_device_list, get_swap_device, key_callback, set_swap_device, setup_state,
 };

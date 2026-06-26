@@ -2,7 +2,6 @@ use std::collections::HashMap;
 #[cfg(target_os = "linux")]
 use std::ffi::CString;
 
-#[cfg(target_os = "linux")]
 use tauri::async_runtime::Mutex;
 use tauri::{AppHandle, Manager};
 
@@ -59,8 +58,49 @@ pub fn setup_state(app: tauri::Builder<tauri::Wry>) -> tauri::Builder<tauri::Wry
 
 // Windows things
 #[cfg(target_os = "windows")]
+use crate::wininputswapper::WinInputSwapper;
+#[cfg(target_os = "windows")]
+type WinState<'a> = tauri::State<'a, Mutex<WinInputSwapper>>;
+
+#[cfg(target_os = "windows")]
+#[tauri::command]
+pub async fn get_device_list(state: WinState<'_>) -> Result<HashMap<String, String>, String> {
+    let state = state.lock().await;
+
+    state.get_sources().map_err(|err| err.to_string())
+}
+
+#[cfg(target_os = "windows")]
+#[tauri::command]
+pub async fn get_swap_device(state: WinState<'_>) -> Result<String, ()> {
+    let state = state.lock().await;
+    Ok(state.swap_to.clone())
+}
+
+#[cfg(target_os = "windows")]
+#[tauri::command]
+pub async fn set_swap_device(state: WinState<'_>, swap_to: String) -> Result<(), ()> {
+    let mut state = state.lock().await;
+    state.swap_to = swap_to;
+    println!("{}", state.swap_to);
+    Ok(())
+}
+
+#[cfg(target_os = "windows")]
+async fn swap_on(state: WinState<'_>) -> Result<(), String> {
+    let mut state = state.lock().await;
+    state.swap_on().map_err(|err| err.to_string())
+}
+
+#[cfg(target_os = "windows")]
+async fn swap_off(state: WinState<'_>) -> Result<(), String> {
+    let mut state = state.lock().await;
+    state.swap_off().map_err(|err| err.to_string())
+}
+
+#[cfg(target_os = "windows")]
 pub fn setup_state(app: tauri::Builder<tauri::Wry>) -> tauri::Builder<tauri::Wry> {
-    todo!()
+    app.manage(Mutex::new(WinInputSwapper::new()))
 }
 
 pub fn key_callback(app: &AppHandle, on: bool) {
