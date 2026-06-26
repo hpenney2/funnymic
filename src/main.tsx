@@ -6,7 +6,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 // just hide the window when closing it.
 // this lets us run in the background and exit from the tray!
 let window = getCurrentWindow();
-let unlisten = await window.onCloseRequested(async (event) => {
+await window.onCloseRequested(async (event) => {
   event.preventDefault();
   window.hide();
 });
