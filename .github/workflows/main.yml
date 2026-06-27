@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   publish-tauri:
@@ -57,6 +57,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -e
+          shopt -s inherit_errexit
           RELEASE_ID=$(gh api repos/${{ github.repository }}/releases/tags/${{ github.ref_name }} --jq '.id')
           echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
 
@@ -65,4 +67,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           releaseId: ${{ steps.get_release.outputs.release_id }}
+          tagName: ${{ github.ref_name }}
+          # uploadPlainBinary: ${{ matrix.platform == 'windows-latest' }}
           args: ${{ matrix.args }}
