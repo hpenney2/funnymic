@@ -24,6 +24,10 @@ export default function KeyComboButton({
   const [proposedCombo, setProposedCombo] = useState("...");
   const [newComboOk, setNewComboOk] = useState(false);
 
+  useEffect(() => {
+    setCombo(startCombo);
+  }, [startCombo]);
+
   const keyEventListener = useCallback((event: KeyboardEvent) => {
     event.preventDefault();
 
@@ -51,15 +55,24 @@ export default function KeyComboButton({
     } else {
       document.removeEventListener("keydown", keyEventListener);
 
-      if (newComboOk && onSelect) {
-        // if onSelect returns false, consider the new combo to fail
-        setNewComboOk(await onSelect(proposedCombo));
+      let isOk = newComboOk;
+      let newCombo: string;
+      if (isOk) {
+        if (onSelect) {
+          // if onSelect returns false, consider the new combo to fail
+          isOk = await onSelect(proposedCombo);
+
+          if (isOk) newCombo = proposedCombo;
+          else newCombo = NO_COMBO;
+        } else {
+          newCombo = proposedCombo;
+        }
+      } else {
+        newCombo = combo;
       }
 
-      if (newComboOk) setCombo(proposedCombo);
-      else setCombo(NO_COMBO);
-
-      setProposedCombo(combo); // sync back for visual parity
+      setCombo(newCombo);
+      setProposedCombo(newCombo); // sync back for visual parity
     }
 
     setSettingCombo(!settingCombo);

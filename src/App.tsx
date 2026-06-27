@@ -4,7 +4,6 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import "./App.css";
 import { RefreshCcw } from "lucide-react";
 import KeyComboButton from "./components/KeyComboButton";
-import { register, unregisterAll } from "@tauri-apps/plugin-global-shortcut";
 
 // const asleep = (ms: number) =>
 //   new Promise((resolve) => setTimeout(resolve, ms));
@@ -13,22 +12,36 @@ function App() {
   const [sources, setSources] = useState<Record<string, string>>({});
   const [currentDevice, setCurrent] = useState<string>("");
 
+  const [currentCombo, setCurrentCombo] = useState<string | undefined>(
+    undefined,
+  );
+
   async function getSources() {
     setSources(await invoke("get_device_list"));
-    setCurrent(await invoke("get_swap_device"));
+
+    let current = await invoke<string>("get_swap_device");
+    setCurrent(current);
+
+    return current;
   }
 
   useEffect(() => {
-    getSources().catch((err) => console.error(err));
-
-    // no device yet, let's show the config window
-    if (currentDevice === "") {
-      getCurrentWindow().show();
-    }
+    getSources()
+      .then((current) => {
+        // no device yet, let's show the config window
+        if (current === "") {
+          getCurrentWindow().show();
+        }
+        return invoke<string | undefined>("get_hotkey");
+      })
+      .then((hotkey) => {
+        setCurrentCombo(hotkey);
+      })
+      .catch((err) => console.error(err));
   }, []);
 
   async function changeKeyCombo(keyCombo: string) {
-    keyCombo = keyCombo.replace(/\s/g, "");
+    // keyCombo = keyCombo.replace(/\s/g, "");
     try {
       // await unregisterAll();
       // await register(keyCombo, (e) => {
@@ -65,13 +78,13 @@ function App() {
               });
               await getSources();
             }}
-            defaultValue={currentDevice}
+            value={currentDevice}
           >
             <option value="" disabled hidden>
               Select an input device
             </option>
             {Object.entries(sources)
-              .sort()
+              .sort((a, b) => a[1].localeCompare(b[1])) // sort by value, not keys
               .map(([name, description]) => {
                 return (
                   <option key={name} value={name}>
@@ -86,7 +99,7 @@ function App() {
         </div>
         <div className="row">
           <label htmlFor="micSelect">Swap key combo</label>
-          <KeyComboButton onSelect={changeKeyCombo} />
+          <KeyComboButton onSelect={changeKeyCombo} startCombo={currentCombo} />
         </div>
       </div>
     </main>

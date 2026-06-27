@@ -16,7 +16,7 @@ pub struct WinInputSwapper {
     pub swap_to: String,
 }
 impl WinInputSwapper {
-    pub fn new() -> Self {
+    pub fn new(swap_to: String) -> Self {
         unsafe {
             CoInitializeEx(None, COINIT_APARTMENTTHREADED)
                 .ok()
@@ -24,7 +24,7 @@ impl WinInputSwapper {
         }
         WinInputSwapper {
             original_source: String::new(),
-            swap_to: String::new(),
+            swap_to,
         }
     }
 
@@ -110,6 +110,10 @@ impl WinInputSwapper {
 
 impl Drop for WinInputSwapper {
     fn drop(&mut self) {
+        if !self.original_source.is_empty() {
+            let _ = self.swap_off();
+        }
+
         unsafe {
             CoUninitialize();
         }

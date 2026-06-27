@@ -11,11 +11,11 @@ pub struct PAInputSwapper {
     pub swap_to: CString,
 }
 impl PAInputSwapper {
-    pub fn new(pulse_client: pulseaudio::Client) -> Self {
+    pub fn new(pulse_client: pulseaudio::Client, swap_to: String) -> Self {
         PAInputSwapper {
             pulse_client,
             original_source: c"".to_owned(),
-            swap_to: c"".to_owned(),
+            swap_to: CString::new(swap_to).expect("couldn't convert swap_to to CString"),
         }
     }
 
@@ -82,5 +82,13 @@ impl PAInputSwapper {
             .collect();
 
         Ok(sources)
+    }
+}
+
+impl Drop for PAInputSwapper {
+    fn drop(&mut self) {
+        if !self.original_source.is_empty() {
+            let _ = self.swap_off();
+        }
     }
 }

@@ -4,6 +4,10 @@ use std::ffi::CString;
 
 use tauri::async_runtime::Mutex;
 use tauri::{AppHandle, Manager};
+use tauri_plugin_store::StoreExt;
+
+use crate::STORE_PATH;
+use crate::STORE_SWAPTO;
 
 // Linux (PulseAudio) things
 #[cfg(target_os = "linux")]
@@ -28,10 +32,17 @@ pub async fn get_swap_device(state: PAState<'_>) -> Result<CString, ()> {
 
 #[cfg(target_os = "linux")]
 #[tauri::command]
-pub async fn set_swap_device(state: PAState<'_>, swap_to: CString) -> Result<(), ()> {
+pub async fn set_swap_device(
+    app: AppHandle,
+    state: PAState<'_>,
+    swap_to: CString,
+) -> Result<(), String> {
     let mut state = state.lock().await;
     state.swap_to = swap_to;
-    println!("{}", state.swap_to.to_str().unwrap());
+    app.store(STORE_PATH).map_err(|err| err.to_string())?.set(
+        STORE_SWAPTO,
+        swap_to.to_str().expect("failed to convert CString"),
+    );
     Ok(())
 }
 
@@ -50,10 +61,10 @@ async fn swap_off(state: PAState<'_>) -> Result<(), String> {
 }
 
 #[cfg(target_os = "linux")]
-pub fn setup_state(app: tauri::Builder<tauri::Wry>) -> tauri::Builder<tauri::Wry> {
+pub fn setup_state(app: &tauri::App, swap_to: String) -> bool {
     let client =
         pulseaudio::Client::from_env(c"funnymic").expect("failed to connect to PulseAudio");
-    app.manage(Mutex::new(PAInputSwapper::new(client)))
+    app.manage(Mutex::new(PAInputSwapper::new(client, swap_to)))
 }
 
 // Windows things
@@ -79,10 +90,16 @@ pub async fn get_swap_device(state: WinState<'_>) -> Result<String, ()> {
 
 #[cfg(target_os = "windows")]
 #[tauri::command]
-pub async fn set_swap_device(state: WinState<'_>, swap_to: String) -> Result<(), ()> {
+pub async fn set_swap_device(
+    app: AppHandle,
+    state: WinState<'_>,
+    swap_to: String,
+) -> Result<(), String> {
     let mut state = state.lock().await;
-    state.swap_to = swap_to;
-    println!("{}", state.swap_to);
+    state.swap_to = swap_to.clone();
+    app.store(STORE_PATH)
+        .map_err(|err| err.to_string())?
+        .set(STORE_SWAPTO, swap_to);
     Ok(())
 }
 
@@ -99,8 +116,8 @@ async fn swap_off(state: WinState<'_>) -> Result<(), String> {
 }
 
 #[cfg(target_os = "windows")]
-pub fn setup_state(app: tauri::Builder<tauri::Wry>) -> tauri::Builder<tauri::Wry> {
-    app.manage(Mutex::new(WinInputSwapper::new()))
+pub fn setup_state(app: &tauri::App, swap_to: String) -> bool {
+    app.manage(Mutex::new(WinInputSwapper::new(swap_to)))
 }
 
 pub fn key_callback(app: &AppHandle, on: bool) {
