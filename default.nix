@@ -23,7 +23,7 @@ pkgs.rustPlatform.buildRustPackage (finalAttrs: {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
     fetcherVersion = 4;
-    hash = "sha256-ieFXjdAM9rbd7o35jmKK45AJyE0XlrGeUtYCAruoQDA=";
+    hash = "sha256-rYbjU09KmqGxn4326BIla1irNSUi8jg+xTKvMp7vtQM=";
   };
 
   nativeBuildInputs =
