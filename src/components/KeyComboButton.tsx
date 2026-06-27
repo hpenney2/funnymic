@@ -25,7 +25,7 @@ export default function KeyComboButton({
   const [newComboOk, setNewComboOk] = useState(false);
 
   useEffect(() => {
-    setCombo(startCombo);
+    setCombo(startCombo ?? NO_COMBO);
   }, [startCombo]);
 
   const keyEventListener = useCallback((event: KeyboardEvent) => {

@@ -25,9 +25,13 @@ pub async fn get_device_list(state: PAState<'_>) -> Result<HashMap<String, Strin
 
 #[cfg(target_os = "linux")]
 #[tauri::command]
-pub async fn get_swap_device(state: PAState<'_>) -> Result<CString, ()> {
+pub async fn get_swap_device(state: PAState<'_>) -> Result<String, ()> {
     let state = state.lock().await;
-    Ok(state.swap_to.clone())
+    Ok(state
+        .swap_to
+        .clone()
+        .into_string()
+        .expect("failed to convert CString"))
 }
 
 #[cfg(target_os = "linux")]
