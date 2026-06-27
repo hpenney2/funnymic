@@ -14,9 +14,11 @@ function fixKeyCode(code: string) {
 export default function KeyComboButton({
   onSelect,
   startCombo = NO_COMBO,
+  id,
 }: {
   onSelect?: (keyCombo: string) => Promise<boolean> | boolean;
   startCombo?: string;
+  id?: string;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [settingCombo, setSettingCombo] = useState(false);
@@ -85,6 +87,7 @@ export default function KeyComboButton({
 
   return (
     <button
+      id={id}
       ref={ref}
       className={`key ${settingCombo ? "key-active" : ""}`}
       type="button"

@@ -98,8 +98,12 @@ function App() {
           </button>
         </div>
         <div className="row">
-          <label htmlFor="micSelect">Swap key combo</label>
-          <KeyComboButton onSelect={changeKeyCombo} startCombo={currentCombo} />
+          <label htmlFor="keySelect">Swap key combo</label>
+          <KeyComboButton
+            id="keySelect"
+            onSelect={changeKeyCombo}
+            startCombo={currentCombo}
+          />
         </div>
       </div>
     </main>
