@@ -54,6 +54,13 @@ fn get_hotkey(app: AppHandle) -> Result<Option<String>, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _, _| {
+            let window = app
+                .get_webview_window("main")
+                .expect("main window should exist");
+            let _ = window.show();
+            let _ = window.set_focus();
+        }))
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
@@ -86,13 +93,10 @@ pub fn run() {
                 .show_menu_on_left_click(true)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => {
-                        app.webview_windows()
-                            .iter()
-                            .next()
-                            .unwrap()
-                            .1
-                            .show()
-                            .expect("window failed to show");
+                        let _ = app
+                            .get_webview_window("main")
+                            .expect("main window should exist")
+                            .show();
                     }
                     "quit" => {
                         app.exit(0);
