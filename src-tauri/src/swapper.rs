@@ -38,7 +38,7 @@ pub async fn set_swap_device(
     swap_to: CString,
 ) -> Result<(), String> {
     let mut state = state.lock().await;
-    state.swap_to = swap_to;
+    state.swap_to = swap_to.clone();
     app.store(STORE_PATH).map_err(|err| err.to_string())?.set(
         STORE_SWAPTO,
         swap_to.to_str().expect("failed to convert CString"),
