@@ -85,10 +85,11 @@ impl PAInputSwapper {
     }
 }
 
-impl Drop for PAInputSwapper {
-    fn drop(&mut self) {
-        if !self.original_source.is_empty() {
-            let _ = self.swap_off();
-        }
-    }
-}
+// needs async support
+// impl Drop for PAInputSwapper {
+//     fn drop(&mut self) {
+//         if !self.original_source.is_empty() {
+//             let _ = self.swap_off();
+//         }
+//     }
+// }
