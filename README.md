@@ -92,7 +92,7 @@ For listening for a key combo globally, the [Global Shortcut](https://github.com
 
 [Tauri](https://tauri.app/) is used as the primary framework for bringing the backend and frontend together. Its [plugin library](https://github.com/tauri-apps/plugins-workspace) is also heavily utilized.
 
-The frontend relies on the [React](https://react.dev/) framework and additionally uses the [Lucide](https://lucide.dev/) icon pack. (The "headphones" icon from Lucide was also used for the "testimonal" icon in this README).
+The frontend relies on the [React](https://react.dev/) framework and additionally uses the [Lucide](https://lucide.dev/) icon pack. (The "headphones" icon from Lucide was also used for the "testimonial" icon in this README).
 
 The name (and logo) is inspired by the infamous Logitech C920/C922 webcam's microphone, dubbed by _some_ as the "funny mic" because it creates horrible noises when screamed at.
 
